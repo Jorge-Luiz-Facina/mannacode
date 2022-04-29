@@ -37,7 +37,7 @@ This project has the responsibility of being the interface that the user will us
 - [Next.js](https://nextjs.org/)
 - [FeathersJS Socket.io](https://docs.feathersjs.com/api/socketio.html)
 
-## mannacode-socket
+## manna-socket
 
 This project is responsible for communicating events
 
