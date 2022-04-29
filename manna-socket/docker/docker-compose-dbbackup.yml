@@ -1,0 +1,111 @@
+version: "3.5"
+
+services:
+  traefik:
+    # The latest official supported Traefik docker image
+    image: traefik:v2.3
+    # Enables the Traefik Dashboard and tells Traefik to listen to docker
+    # enable --log.level=INFO so we can see what Traefik is doing in the log files
+    ports:
+      # Exposes port 80 for incomming web requests
+      - "80:80"
+      - "443:443"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Copies the Let's Encrypt certificate locally for ease of backing up
+      - ./letsencrypt:/letsencrypt
+        # Mounts the Traefik static configuration inside the Traefik container
+      - ./traefik.yml:/etc/traefik/traefik.yml
+    networks:
+      - backend
+      - frontend
+  api:
+    image: ${IMAGE_IDENTIFIER}
+    environment:
+      NODE_ENV: production
+      TZ: 'America/SãoPaulo'
+      MANNA_API_HOST: ${MANNA_API_HOST}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mannacode-front.rule=Host(`az.class-coding.com`)
+      - traefik.http.routers.mannacode-front.entrypoints=web
+      - traefik.http.routers.mannacode-front-websecure.rule=Host(`az.class-coding.com`)
+      - traefik.http.routers.mannacode-front-websecure.tls.certresolver=myresolver
+      - traefik.http.routers.mannacode-front-websecure.tls=true
+      - traefik.http.routers.mannacode-front-websecure.entrypoints=websecure
+      - traefik.http.routers.mannacode-front.middlewares=mannacode-front-redirect-websecure
+      - traefik.http.middlewares.mannacode-front-redirect-websecure.redirectscheme.scheme=https
+      - traefik.http.middlewares.mannacode-front-redirect-websecure.redirectscheme.permanent=true
+      # if you have multiple ports exposed on the service, specify port in the websecure service
+      - traefik.http.services.mannacode-front-websecure.loadbalancer.server.port=4000
+    networks:
+      - backend
+      - frontend
+
+  db:
+    image: postgres:12-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: 'tt'
+      POSTGRES_PASSWORD: 'tt'
+      POSTGRES_DB: 'tt'
+    labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.pgsql.rule=HostSNI(`*`)
+      - traefik.tcp.routers.pgsql.service=pgsql
+      - traefik.tcp.routers.pgsql.entrypoints=pgsql
+      - traefik.tcp.services.pgsql.loadbalancer.server.port=5432
+    networks:
+      - backend
+      - frontend
+
+  pgbackups:
+    container_name: Backup
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - ./backup:/backups
+    links:
+      - db:db
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=tt 
+      - POSTGRES_USER=tt
+      - POSTGRES_PASSWORD=tt
+      - POSTGRES_EXTRA_OPTS=-Z9 --schema=public --blobs
+      - SCHEDULE=@midnight
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=81
+
+  redis:
+    image: redis:5
+    command: redis-server --requirepass tt
+    labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.redis.rule=HostSNI(`*`)
+      - traefik.tcp.routers.redis.service=redis
+      - traefik.tcp.routers.redis.tls=true
+      - traefik.tcp.routers.redis.entrypoints=redis
+      - traefik.tcp.services.redis.loadbalancer.server.port=6379
+    networks:
+      - backend
+      - frontend
+volumes:
+  pgdata:
+
+networks:
+  frontend:
+    driver: overlay
+    external: true
+  backend:
+    driver: overlay
+    external: true
+
+
+

@@ -1,0 +1,128 @@
+stages:
+  - test
+  - build
+  - migrate
+  - deploy
+
+test:
+  stage: test
+  image: node:14-alpine
+  services:
+    - postgres:11-alpine
+  variables:
+    POSTGRES_DB: mannacode
+    POSTGRES_USER: test
+    POSTGRES_PASSWORD: test
+    NODE_ENV: test
+  script:
+    - yarn install --frozen-lockfile
+    - yarn global add db-migrate
+    - db-migrate up --env test
+    - yarn run jest
+  when: manual
+
+lint:
+  stage: test
+  image: node:14-alpine
+  script:
+    - yarn install --frozen-lockfile
+    - yarn eslint
+  when: manual
+
+migration_beta:
+  image: node:14-alpine
+  stage: migrate
+  variables:
+    NODE_ENV: production
+    DB_HOST: ${DB_HOST_HOMOL}
+  script:
+    - npm install -g db-migrate
+    - npm install -g db-migrate-pg
+    - db-migrate up --env homolog
+  needs:
+    - build_beta
+  when: manual
+  only:
+    - develop
+
+migration_prod:
+  image: node:14-alpine
+  stage: migrate
+  variables:
+    NODE_ENV: production
+  script:
+    - npm install -g db-migrate
+    - npm install -g db-migrate-pg
+    - db-migrate up --env prod
+  needs:
+    - build_prod
+  when: manual
+  only:
+    - master
+
+
+build_beta:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    IMAGE_IDENTIFIER: $CI_REGISTRY_IMAGE:latest
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_IDENTIFIER .
+    - docker push $IMAGE_IDENTIFIER
+  when: manual
+  only:
+    - develop
+    
+build_prod:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    IMAGE_IDENTIFIER: $CI_REGISTRY_IMAGE:production
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_IDENTIFIER .
+    - docker push $IMAGE_IDENTIFIER
+  when: manual
+  only:
+    - master
+
+deploy_beta:
+  stage: deploy
+  image: docker/compose:alpine-1.26.0
+  before_script:
+    - apk update && apk add bash && apk add openssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY_HOMOL" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - chmod +x ./.gitlab-deploy-homol.sh
+    - bash .gitlab-deploy-homol.sh
+  needs:
+    - build_beta
+  when: manual
+  only:
+    - develop
+
+deploy_prod:
+  stage: deploy
+  image: docker/compose:alpine-1.26.0
+  before_script:
+    - apk update && apk add bash && apk add openssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - chmod +x ./.gitlab-deploy.sh
+    - bash .gitlab-deploy.sh
+  when: manual
+  only:
+    - master

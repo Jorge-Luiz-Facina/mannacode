@@ -1,0 +1,57 @@
+version: "3.5"
+
+services:
+  traefik:
+    # The latest official supported Traefik docker image
+    image: traefik:v2.3
+    # Enables the Traefik Dashboard and tells Traefik to listen to docker
+    # enable --log.level=INFO so we can see what Traefik is doing in the log files
+    ports:
+      - "80:80"
+      - "6379:6379"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+       # Mounts the Traefik static configuration inside the Traefik container
+      - ./traefik.yml:/traefik.yml
+    networks:
+      - backend
+      - frontend
+
+  api:
+    image: ${IMAGE_IDENTIFIER}
+    environment:
+      NODE_ENV: production
+      TZ: 'America/SãoPaulo'
+      MANNA_API_HOST: ${MANNA_API_HOST}
+      MANNA_SOCKET_LOGIN: ${MANNA_SOCKET_LOGIN}
+      MANNA_SOCKET_PASSWORD: ${MANNA_SOCKET_PASSWORD}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mannacode-socket.rule=Host(`az.class-coding.com`)
+      - traefik.http.routers.mannacode-socket.entrypoints=web
+      - traefik.http.services.mannacode-socket.loadbalancer.server.port=4000
+    networks:
+      - backend
+      - frontend
+  
+  redis:
+    image: redis:5
+    command: redis-server --requirepass mbvfjqewai459607fdhgt56fhnvf67453bnmzpiu
+    labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.redis.rule=HostSNI(`*`)
+      - traefik.tcp.routers.redis.service=redis
+      - traefik.tcp.routers.redis.entrypoints=redis
+      - traefik.tcp.services.redis.loadbalancer.server.port=6379
+    networks:
+      - backend
+      - frontend
+
+networks:
+  frontend:
+    driver: overlay
+    external: true
+  backend:
+    driver: overlay
+    external: true

@@ -1,0 +1,9 @@
+export enum StatusChallenges {
+  NORMAL = 'NORMAL',
+  INITIAL = 'INITIAL',
+  INITIALIZED = 'INITIALIZED',
+  EXECUTION = 'EXECUTION',
+  PUNCTUATE = 'PUNCTUATE',
+  SCORE = 'SCORE',
+  END = 'END'
+}

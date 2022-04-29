@@ -1,0 +1,15 @@
+version: "3.5"
+
+services:
+  api:
+    networks: 
+      - backend
+      - frontend
+
+networks:
+  frontend:
+    driver: overlay
+    external: true
+  backend:
+    driver: overlay
+    external: true

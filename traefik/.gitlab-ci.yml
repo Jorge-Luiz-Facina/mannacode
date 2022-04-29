@@ -1,0 +1,18 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  image: docker/compose:alpine-1.26.0
+  before_script:
+    - apk update && apk add bash && apk add openssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - chmod +x ./.gitlab-deploy.sh
+    - bash .gitlab-deploy.sh
+  when: manual
+  only:
+    - master
+

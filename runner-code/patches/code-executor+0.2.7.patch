@@ -1,0 +1,47 @@
+diff --git a/node_modules/code-executor/dist/src/langs/Csharp/Dockerfile b/node_modules/code-executor/dist/src/langs/Csharp/Dockerfile
+new file mode 100644
+index 0000000..9c15db7
+--- /dev/null
++++ b/node_modules/code-executor/dist/src/langs/Csharp/Dockerfile
+@@ -0,0 +1,4 @@
++FROM mono:latest
++RUN adduser --disabled-password --gecos "" runner
++COPY start.sh start.sh
++WORKDIR /app
+\ No newline at end of file
+diff --git a/node_modules/code-executor/dist/src/langs/Csharp/start.sh b/node_modules/code-executor/dist/src/langs/Csharp/start.sh
+new file mode 100644
+index 0000000..8ca95b0
+--- /dev/null
++++ b/node_modules/code-executor/dist/src/langs/Csharp/start.sh
+@@ -0,0 +1,5 @@
++i=$1
++date +%s%N > /app/time$i.txt
++timeout $2 bash -c "( cat /app/in$i.txt | ( mcs /app/Main.cs && mono /app/Main.exe) ) 2> /app/error$i.txt 1> /app/output$i.txt"
++echo $? > /app/exitCode$i.txt
++date +%s%N >> /app/time$i.txt
+\ No newline at end of file
+diff --git a/node_modules/code-executor/dist/src/langs/Javascript/Dockerfile b/node_modules/code-executor/dist/src/langs/Javascript/Dockerfile
+index 586a048..ae0c638 100644
+--- a/node_modules/code-executor/dist/src/langs/Javascript/Dockerfile
++++ b/node_modules/code-executor/dist/src/langs/Javascript/Dockerfile
+@@ -1,4 +1,4 @@
+-FROM node:10-alpine
++FROM node:16-stretch-slim
+ RUN adduser --disabled-password --gecos "" runner
+ COPY start.sh start.sh
+ WORKDIR /app
+\ No newline at end of file
+diff --git a/node_modules/code-executor/dist/src/utils/findExtension.js b/node_modules/code-executor/dist/src/utils/findExtension.js
+index 106c27c..7238fc4 100644
+--- a/node_modules/code-executor/dist/src/utils/findExtension.js
++++ b/node_modules/code-executor/dist/src/utils/findExtension.js
+@@ -2,7 +2,7 @@
+ exports.__esModule = true;
+ exports.extension = void 0;
+ exports.extension = {
+-    Python: 'py', Bash: 'sh', C: 'c', Cplusplus: 'cpp', Golfscript: 'gs', Ruby: 'rb', Javascript: 'js', Java: 'java', Perl: 'pl', Swift: 'swift', Rust: 'rs', Brainfuck: 'bf', O5AB1E: 'abe'
++    Csharp: 'cs', Python: 'py', Bash: 'sh', C: 'c', Cplusplus: 'cpp', Golfscript: 'gs', Ruby: 'rb', Javascript: 'js', Java: 'java', Perl: 'pl', Swift: 'swift', Rust: 'rs', Brainfuck: 'bf', O5AB1E: 'abe'
+ };
+ function findExtension(language) {
+     var fileExtension = '';

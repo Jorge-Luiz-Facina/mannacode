@@ -1,0 +1,26 @@
+version: '3.5'
+
+services:
+  traefik:
+    # The latest official supported Traefik docker image
+    image: traefik:v2.3
+    # Enables the Traefik Dashboard and tells Traefik to listen to docker
+    # enable --log.level=INFO so we can see what Traefik is doing in the log files
+    ports:
+      # Exposes port 80 for incomming web requests
+      - "80:80"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+       # Mounts the Traefik static configuration inside the Traefik container
+      - ./traefik.yml:/etc/traefik/traefik.yml
+    networks:
+      - backend
+      - frontend
+networks:
+  frontend:
+    driver: overlay
+    external: true
+  backend:
+    driver: overlay
+    external: true

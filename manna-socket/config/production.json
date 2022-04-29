@@ -1,0 +1,16 @@
+{
+  "host": "localhost",
+  "port": 4000,
+  "public": "../public/",
+  "paginate": {
+    "default": 10,
+    "max": 50
+  },
+  "user": {
+    "login": "MANNA_SOCKET_LOGIN",
+    "password": "MANNA_SOCKET_PASSWORD"
+  },
+  "mannaapi": {
+    "host": "MANNA_API_HOST"
+  }
+}

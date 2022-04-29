@@ -1,0 +1,71 @@
+{
+  "host": "localhost",
+  "port": 3030,
+  "public": "../public/",
+  "webURL": "http://localhost:3000",
+  "paginate": {
+    "default": 100,
+    "max": 100 
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "iusers",
+    "secret": "YOUR_SECRET",
+    "authStrategies": [
+      "jwt",
+      "local"
+    ],
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://yourdomain.com",
+      "issuer": "feathers",
+      "algorithm": "HS256",
+      "expiresIn": "1d"
+    },
+    "local": {
+      "usernameField": "email",
+      "passwordField": "password"
+    }
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379
+  },
+  "mailer": {
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "username": "YourEmail",
+    "password": "SECRET_PASSWORD",
+    "secure": false,
+    "from": ""
+  },
+  "postgres": {
+    "user": "dev",
+    "password": "dev",
+    "host": "localhost",
+    "database": "mannacode",
+    "port": "5432"
+  },
+  "postgrestest": {
+    "user": "test",
+    "password": "test",
+    "host": "postgres",
+    "database": "mannacode",
+    "port": "5432"
+  },
+  "runnercode": {
+    "login": "SECRET_LOGIN",
+    "password": "SECRET_PASSWORD",
+    "host":"http://localhost:3131"
+  },
+  "mannasocket": {
+    "login": "SECRET_LOGIN",
+    "password": "SECRET_PASSWORD",
+    "host":"http://localhost:4000"
+  },
+  "player":{
+    "secret":"SECRET"
+  }
+}

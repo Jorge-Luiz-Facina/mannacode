@@ -1,0 +1,11 @@
+version: "3.5"
+
+services:
+  redis:
+    container_name: redismannacode
+    image: redis
+    command: --port 6380
+    ports:
+      - "6380:6380"
+    expose:
+      - "6380"

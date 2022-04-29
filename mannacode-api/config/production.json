@@ -1,0 +1,37 @@
+{
+  "host": "0.0.0.0",
+  "webURL": "www.class-coding.com",
+  "postgres": {
+    "host": "DB_HOST",
+    "user": "DB_USER",
+    "password": "DB_PASSWORD",
+    "database": "DB_NAME",
+    "port": "DB_PORT"
+  },
+  "redis": {
+    "host": "REDIS_HOST",
+    "port": "REDIS_PORT",
+    "password": "REDIS_PASSWORD"
+  },
+  "mailer": {
+    "host": "MAILER_HOST",
+    "port": "MAILER_PORT",
+    "username": "MAILER_USER",
+    "password": "MAILER_PASSWORD",
+    "secure": false,
+    "from": "MAILER_FROM"
+  },
+  "runnercode": {
+    "login": "LOGIN_RUNNER",
+    "password": "PASSWORD_RUNNER",
+    "host":"HOST_RUNNER"
+  },
+  "mannasocket": {
+    "login": "LOGIN_SOCKET",
+    "password": "PASSWORD_SOCKET",
+    "host":"HOST_SOCKET"
+  },
+  "player":{
+    "secret":"SECRET"
+  }
+}

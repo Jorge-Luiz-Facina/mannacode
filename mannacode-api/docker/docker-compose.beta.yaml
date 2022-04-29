@@ -1,0 +1,43 @@
+version: "3.5"
+
+services:
+  api:
+    environment:
+      NODE_ENV: production
+      PORT: 3030
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: mannacode
+      DB_USER: root
+      DB_PASSWORD: beta2021
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MAILER_HOST: "smtp.gmail.com"
+      MAILER_PORT: 587
+      MAILER_USER: "your@gmail.com"
+      MAILER_PASSWORD: "------"
+      MAILER_FROM: ""
+      LOGIN_RUNNER: ""
+      PASSWORD_RUNNER: ""
+      HOST: ""
+    ports:
+      - "3030:3030"
+
+  database:
+    image: postgres:12-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: beta2021
+      POSTGRES_DB: mannacode
+
+  redis:
+    image: redis:5
+    ports:
+      - '6379:6379'
+
+volumes:
+  pgdata:

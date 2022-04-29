@@ -1,0 +1,77 @@
+stages:
+  - test
+  - build
+  - deploy
+
+
+lint:
+  stage: test
+  image: node:alpine
+  script:
+    - yarn install --frozen-lockfile
+    - yarn eslint --color -c .eslintrc.js --ext .tsx ./
+  when: manual
+
+build_beta:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    IMAGE_IDENTIFIER: $CI_REGISTRY_IMAGE:latest
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL}" --build-arg NEXT_PUBLIC_SOCKET_URL="${NEXT_PUBLIC_SOCKET_URL}" -t $IMAGE_IDENTIFIER .
+    - docker push $IMAGE_IDENTIFIER
+  when: manual
+  only:
+    - develop
+
+build:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    IMAGE_IDENTIFIER: $CI_REGISTRY_IMAGE:production
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL}" --build-arg NEXT_PUBLIC_SOCKET_URL="${NEXT_PUBLIC_SOCKET_URL}" -t $IMAGE_IDENTIFIER .
+    - docker push $IMAGE_IDENTIFIER
+  when: manual
+  only:
+    - master
+
+deploy_beta:
+  stage: deploy
+  image: docker/compose:alpine-1.26.0
+  before_script:
+    - apk update && apk add bash && apk add openssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY_HOMOL" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - chmod +x ./.gitlab-deploy-homol.sh
+    - bash .gitlab-deploy-homol.sh
+  when: manual
+  only:
+    - develop
+
+deploy:
+  stage: deploy
+  image: docker/compose:alpine-1.26.0
+  before_script:
+    - apk update && apk add bash && apk add openssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - chmod +x ./.gitlab-deploy.sh
+    - bash .gitlab-deploy.sh
+  when: manual
+  only:
+    - master

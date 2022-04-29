@@ -1,0 +1,21 @@
+version: "3.5"
+
+services:
+  api:
+    deploy:
+      labels:
+        - traefik.enable=true
+        - "traefik.docker.network=frontend"
+        - "traefik.http.routers.mannacode-api.rule=Host(`www.class-coding.com`) && PathPrefix(`/api`)"
+        - traefik.http.routers.mannacode-api.entrypoints=web
+        - "traefik.http.routers.mannacode-api-websecure.rule=Host(`www.class-coding.com`) && PathPrefix(`/api`)"
+        - traefik.http.routers.mannacode-api-websecure.tls.certresolver=myresolver
+        - traefik.http.routers.mannacode-api-websecure.tls=true
+        - traefik.http.routers.mannacode-api-websecure.entrypoints=websecure
+        - traefik.http.routers.mannacode-api.middlewares=mannacode-api-redirect-websecure
+        - traefik.http.middlewares.mannacode-api-redirect-websecure.redirectscheme.scheme=https
+        - traefik.http.middlewares.mannacode-api-redirect-websecure.redirectscheme.permanent=true
+        # if you have multiple ports exposed on the service, specify port in the websecure service
+        - traefik.http.services.mannacode-api-websecure.loadbalancer.server.port=3000
+        - traefik.http.routers.mannacode-api.middlewares=mannacode-api-stripprefix
+        - traefik.http.middlewares.mannacode-api-stripprefix.stripprefix.prefixes=/api

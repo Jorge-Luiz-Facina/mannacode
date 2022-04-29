@@ -1,0 +1,32 @@
+stages:
+  - homol
+  - prod
+
+deploy_homol:
+  stage: homol
+  before_script:
+    - apk update && apk add bash && apk add openssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY_HOMOL" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - chmod +x ./.gitlab-deploy-homol.sh
+    - bash .gitlab-deploy-homol.sh
+  when: manual
+  only:
+    - develop
+
+deploy:
+  stage: prod
+  before_script:
+    - apk update && apk add bash && apk add openssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+  script:
+    - chmod +x ./.gitlab-deploy.sh
+    - bash .gitlab-deploy.sh
+  when: manual
+  only:
+    - master
+

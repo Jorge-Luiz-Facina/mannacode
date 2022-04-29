@@ -1,0 +1,52 @@
+version: "3.5"
+
+services:
+  api:
+    image: ${IMAGE_IDENTIFIER}
+    environment:
+      NODE_ENV: production
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-mannacode}
+      DB_USER: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MAILER_HOST: ${MAILER_HOST}
+      MAILER_PORT: ${MAILER_PORT:-587}
+      MAILER_USER: ${MAILER_USER}
+      MAILER_PASSWORD: ${MAILER_PASSWORD}
+      MAILER_FROM: ${MAILER_FROM}
+      LOGIN_RUNNER: ${LOGIN_RUNNER}
+      PASSWORD_RUNNER: ${PASSWORD_RUNNER}
+      HOST_RUNNER: ${HOST_RUNNER}
+      LOGIN_SOCKET: ${LOGIN_SOCKET}
+      PASSWORD_SOCKET: ${PASSWORD_SOCKET}
+      HOST_SOCKET: ${HOST_SOCKET}
+      HOST: ${HOST}
+      TZ: 'America/SãoPaulo'
+    extra_hosts :
+      host.docker.internal : host-gateway
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - "traefik.http.routers.mannacode-api.rule=Host(`www.class-coding.com`) && PathPrefix(`/api`)"
+      - traefik.http.routers.mannacode-api.entrypoints=web
+      - traefik.http.services.mannacode-api.loadbalancer.server.port=3030
+      - traefik.http.routers.mannacode-api.middlewares=mannacode-api-stripprefix
+      - traefik.http.middlewares.mannacode-api-stripprefix.stripprefix.prefixes=/api
+    networks:
+      - backend
+      - frontend
+  
+networks:
+  frontend:
+    driver: overlay
+    external: true
+  backend:
+    driver: overlay
+    external: true
+
+
+

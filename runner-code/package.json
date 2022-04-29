@@ -1,0 +1,77 @@
+{
+  "name": "runner-code",
+  "description": "runner-code",
+  "version": "0.0.0",
+  "homepage": "",
+  "private": true,
+  "main": "src",
+  "keywords": [
+    "feathers"
+  ],
+  "author": {
+    "name": "Jorge Luiz Facina",
+    "email": "jorgeluizfac@hotmail.com"
+  },
+  "contributors": [],
+  "bugs": {},
+  "directories": {
+    "lib": "src",
+    "test": "test/",
+    "config": "config/"
+  },
+  "engines": {
+    "node": "^14.15.3",
+    "npm": ">= 3.0.0"
+  },
+  "scripts": {
+    "debug": "ts-node-dev --inspect --respawn --transpile-only --no-notify src/",
+    "start": "node lib/",
+    "jest": "jest  --forceExit",
+    "clean": "shx rm -rf test/data/",
+    "compile": "shx rm -rf lib/ && tsc",
+    "lint": "eslint --color -c .eslintrc.js --ext .ts src/**/*.ts",
+    "lint-fix": "eslint --color --fix -c .eslintrc.js --ext .ts src/**/*.ts"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ],
+    "ignore": []
+  },
+  "types": "lib/",
+  "dependencies": {
+    "@feathersjs/configuration": "^4.5.8",
+    "@feathersjs/errors": "^4.5.8",
+    "@feathersjs/express": "^4.5.8",
+    "@feathersjs/feathers": "^4.5.8",
+    "@feathersjs/transport-commons": "^4.5.8",
+    "bluebird": "^3.7.2",
+    "code-executor": "^0.2.7",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "debug": "^4.1.1",
+    "feathers-hooks-common": "^5.0.4",
+    "feathers-sequelize": "^6.2.0",
+    "helmet": "^3.23.3",
+    "lodash": "^4.17.20",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
+    "redis": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.32",
+    "@types/compression": "^1.7.0",
+    "@types/cors": "^2.8.7",
+    "@types/helmet": "0.0.48",
+    "@types/jest": "^26.0.10",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "eslint": "^7.7.0",
+    "jest": "^26.4.2",
+    "nodemon": "^2.0.4",
+    "shx": "^0.3.2",
+    "ts-jest": "^26.3.0",
+    "ts-node-dev": "^1.0.0-pre.61",
+    "typescript": "^3.9.7"
+  }
+}

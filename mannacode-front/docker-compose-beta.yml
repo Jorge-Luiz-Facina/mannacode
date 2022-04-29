@@ -1,0 +1,28 @@
+version: "3.5"
+
+services:
+  web:
+    image: ${IMAGE_IDENTIFIER}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mannacode-front.rule=Host(`www.class-coding.com`)
+      - traefik.http.routers.mannacode-front.entrypoints=web
+      - traefik.http.routers.mannacode-front-websecure.rule=Host(`www.class-coding.com`)
+      - traefik.http.routers.mannacode-front-websecure.tls.certresolver=myresolver
+      - traefik.http.routers.mannacode-front-websecure.entrypoints=websecure
+      - traefik.http.services.mannacode-front-websecure.loadbalancer.server.port=3000
+      - traefik.http.routers.mannacode-front-websecure.tls=true
+      - traefik.http.routers.mannacode-front-websecure.tls.domains[0].main=class-coding.com
+      - traefik.http.routers.mannacode-front-websecure.tls.domains[0].sans=*.class-coding.com
+    networks:
+      - backend
+      - frontend
+  
+networks:
+  frontend:
+    driver: overlay
+    external: true
+  backend:
+    driver: overlay
+    external: true
+

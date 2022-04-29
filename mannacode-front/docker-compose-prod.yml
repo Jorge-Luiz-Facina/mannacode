@@ -1,0 +1,22 @@
+version: "3.5"
+
+services:
+  web:
+    image: ${IMAGE_IDENTIFIER}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mannacode-front.rule=Host(`www.class-coding.com`)
+      - traefik.http.routers.mannacode-front.entrypoints=web
+      - traefik.http.services.mannacode-front.loadbalancer.server.port=3000
+    networks:
+      - backend
+      - frontend
+
+networks:
+  frontend:
+    driver: overlay
+    external: true
+  backend:
+    driver: overlay
+    external: true
+

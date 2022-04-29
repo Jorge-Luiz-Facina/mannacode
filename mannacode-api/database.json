@@ -1,0 +1,44 @@
+{
+  "dev": {
+    "driver": "pg",
+    "host": "localhost",
+    "port": 5432,
+    "database": "mannacode",
+    "user": "dev",
+    "password": "dev"
+  },
+  "test": {
+    "driver": "pg",
+    "host": "postgres",
+    "port": 5432,
+    "database": "mannacode",
+    "user": "test",
+    "password": "test"
+  },
+  "prod": {
+    "driver": "pg",
+    "user": {
+        "ENV": "DB_USER"
+    },
+    "password": {
+        "ENV": "DB_PASSWORD"
+    },
+    "host": {
+        "ENV": "DB_HOST"
+    },
+    "database": {
+        "ENV": "DB_NAME"
+    }
+ },
+  "homolog": {
+    "driver": "pg",
+    "user": "root",
+    "password": "-----",
+    "database": "-----",
+    "port": 5432,
+    "host": { "ENV": "DB_HOST" }
+  },
+
+  "sql-file": true
+}
+  
